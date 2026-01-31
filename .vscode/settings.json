@@ -20,5 +20,6 @@
   "files.readonlyInclude": {
     "**/.elan/**": true,
     "**/.lake/**": true
-  }
+  },
+  "editor.wordWrap": "off"
 }
