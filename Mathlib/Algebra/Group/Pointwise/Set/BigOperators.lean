@@ -169,7 +169,7 @@ theorem image_fintype_prod_pi [Fintype ι] (S : ι → Set α) :
 
 end CommMonoid
 
-/-! TODO: define `decidable_mem_finset_prod` and `decidable_mem_finset_sum`. -/
-
+@[to_additive]
+def decidable_mem_finset_prod : Prop := sorry
 
 end Set
