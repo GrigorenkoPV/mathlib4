@@ -141,13 +141,16 @@ jobs:
         id: form_the_message
         run: |
           # for debugging, we print the available variables
-          echo "github.event.action: '${{ github.event.action }}'"
+          echo "github.event.action: '${GITHUB_EVENT_ACTION}'"
 
           echo ""
           message="$(
-            ./scripts/maintainer_merge_message.sh "${AUTHOR}" "${{ steps.merge_or_delegate.outputs.mOrD }}" "${EVENT_NAME}" "${PR_NUMBER}" "${PR_URL}" "${PR_TITLE_ISSUE}${PR_TITLE_PR}" "${COMMENT_EVENT}${COMMENT_REVIEW}" "${PR_AUTHOR}"
+            ./scripts/maintainer_merge_message.sh "${AUTHOR}" "${STEPS_MERGE_OR_DELEGATE_OUTPUTS_MORD}" "${EVENT_NAME}" "${PR_NUMBER}" "${PR_URL}" "${PR_TITLE_ISSUE}${PR_TITLE_PR}" "${COMMENT_EVENT}${COMMENT_REVIEW}" "${PR_AUTHOR}"
           )"
           printf 'title<<EOF\n%s\nEOF' "${message}" | tee "$GITHUB_OUTPUT"
+        env:
+          GITHUB_EVENT_ACTION: ${{ github.event.action }}
+          STEPS_MERGE_OR_DELEGATE_OUTPUTS_MORD: ${{ steps.merge_or_delegate.outputs.mOrD }}
 
       - name: Send message on Zulip
         if: ${{ steps.actorTeams.outputs.isTeamMember == 'true' }}

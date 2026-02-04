@@ -100,9 +100,12 @@ jobs:
         run: |
           for label in awaiting-author maintainer-merge; do
             curl --request DELETE \
-              --url "https://api.github.com/repos/${{ github.repository }}/issues/${{ steps.extract-data.outputs.pr_number }}/labels/${label}" \
-              --header 'authorization: Bearer ${{ steps.app-token.outputs.token }}'
+              --url "https://api.github.com/repos/${{ github.repository }}/issues/${STEPS_EXTRACT_DATA_OUTPUTS_PR_NUMBER}/labels/${label}" \
+              --header 'authorization: Bearer ${STEPS_APP_TOKEN_OUTPUTS_TOKEN}'
           done
+        env:
+          STEPS_EXTRACT_DATA_OUTPUTS_PR_NUMBER: ${{ steps.extract-data.outputs.pr_number }}
+          STEPS_APP_TOKEN_OUTPUTS_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: On bors r/d-, remove ready-to-merge or delegated label
         if: ${{ ! steps.extract-data.outputs.removeLabels == '' && steps.user_permission.outputs.require-result == 'true' }}
@@ -111,9 +114,12 @@ jobs:
         run: |
           for label in ready-to-merge delegated; do
             curl --request DELETE \
-              --url "https://api.github.com/repos/${{ github.repository }}/issues/${{ steps.extract-data.outputs.pr_number }}/labels/${label}" \
-              --header 'authorization: Bearer ${{ steps.app-token.outputs.token }}'
+              --url "https://api.github.com/repos/${{ github.repository }}/issues/${STEPS_EXTRACT_DATA_OUTPUTS_PR_NUMBER}/labels/${label}" \
+              --header 'authorization: Bearer ${STEPS_APP_TOKEN_OUTPUTS_TOKEN}'
           done
+        env:
+          STEPS_EXTRACT_DATA_OUTPUTS_PR_NUMBER: ${{ steps.extract-data.outputs.pr_number }}
+          STEPS_APP_TOKEN_OUTPUTS_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: Set up Python
         if: ${{ ! steps.extract-data.outputs.mOrD == '' &&
@@ -148,5 +154,7 @@ jobs:
           ZULIP_API_KEY: ${{ secrets.ZULIP_API_KEY }}
           ZULIP_EMAIL: github-mathlib4-bot@leanprover.zulipchat.com
           ZULIP_SITE: https://leanprover.zulipchat.com
+          STEPS_EXTRACT_DATA_OUTPUTS_MORD: ${{ steps.extract-data.outputs.mOrD }}
+          STEPS_EXTRACT_DATA_OUTPUTS_PR_NUMBER: ${{ steps.extract-data.outputs.pr_number }}
         run: |
-          python scripts/zulip_emoji_reactions.py "$ZULIP_API_KEY" "$ZULIP_EMAIL" "$ZULIP_SITE" "${{ steps.extract-data.outputs.mOrD }}" "${{ steps.extract-data.outputs.mOrD }}" "${{ steps.extract-data.outputs.pr_number }}"
+          python scripts/zulip_emoji_reactions.py "$ZULIP_API_KEY" "$ZULIP_EMAIL" "$ZULIP_SITE" "${STEPS_EXTRACT_DATA_OUTPUTS_MORD}" "${STEPS_EXTRACT_DATA_OUTPUTS_MORD}" "${STEPS_EXTRACT_DATA_OUTPUTS_PR_NUMBER}"

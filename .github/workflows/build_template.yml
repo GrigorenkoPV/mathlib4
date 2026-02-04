@@ -313,7 +313,7 @@ jobs:
         shell: bash # only runs `cache get` from `master-branch`, so doesn't need to be inside landrun
         run: |
           cd pr-branch
-          if [[ "${{ steps.get_cache_part2_test.outcome }}" == "success" ]]; then
+          if [[ "${STEPS_GET_CACHE_PART2_TEST_OUTCOME}" == "success" ]]; then
             echo "Fetching all remaining cache..."
 
             ../master-branch/.lake/build/bin/cache get
@@ -324,6 +324,8 @@ jobs:
             echo "WARNING: 'lake build --no-build -v Mathlib.Init' failed."
             echo "No cache for 'Mathlib.Init' available or it could not be prepared."
           fi
+        env:
+          STEPS_GET_CACHE_PART2_TEST_OUTCOME: ${{ steps.get_cache_part2_test.outcome }}
 
       - name: update {Mathlib, Tactic, Counterexamples, Archive}.lean
         id: mk_all
@@ -720,8 +722,10 @@ jobs:
         # (and send an annoying email) if the labels don't exist
         run: |
           curl --request DELETE \
-            --url https://api.github.com/repos/${{ github.repository }}/issues/${{ steps.PR.outputs.number }}/labels/awaiting-CI \
+            --url https://api.github.com/repos/${{ github.repository }}/issues/${STEPS_PR_OUTPUTS_NUMBER}/labels/awaiting-CI \
             --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}'
+        env:
+          STEPS_PR_OUTPUTS_NUMBER: ${{ steps.PR.outputs.number }}
 
       - if: contains(steps.PR.outputs.pr_labels, 'auto-merge-after-CI')
         name: Get PR label timeline data
@@ -759,8 +763,8 @@ jobs:
         id: get-label-actor
         run: |
           # Parse the GraphQL response and filter for the specific label
-          echo '${{ steps.get-timeline.outputs.data }}'
-          USERNAME=$(echo '${{ steps.get-timeline.outputs.data }}' | jq -r '
+          echo '${STEPS_GET_TIMELINE_OUTPUTS_DATA}'
+          USERNAME=$(echo '${STEPS_GET_TIMELINE_OUTPUTS_DATA}' | jq -r '
             .repository.pullRequest.timelineItems.nodes
             | map(select(.label.name == "auto-merge-after-CI"))
             | sort_by(.createdAt)
@@ -780,6 +784,8 @@ jobs:
 
           echo "username=$USERNAME" >> "$GITHUB_OUTPUT"
           echo "Found label actor: $USERNAME"
+        env:
+          STEPS_GET_TIMELINE_OUTPUTS_DATA: ${{ steps.get-timeline.outputs.data }}
 
       - if: contains(steps.PR.outputs.pr_labels, 'auto-merge-after-CI')
         name: check team membership

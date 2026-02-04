@@ -47,7 +47,7 @@ jobs:
           if [ "${{ matrix.branch_type }}" == "master" ]; then
             echo "BRANCH_REF=${{ env.DEFAULT_BRANCH }}" >> "$GITHUB_ENV"
           else
-            echo "BRANCH_REF=${{ env.LATEST_TAG }}" >> "$GITHUB_ENV"
+            echo "BRANCH_REF=${LATEST_TAG}" >> "$GITHUB_ENV"
           fi
 
       # Checkout the branch or tag we want to test.
@@ -117,7 +117,7 @@ jobs:
           if [ "${{ matrix.branch_type }}" == "master" ]; then
             echo "BRANCH_REF=${{ env.DEFAULT_BRANCH }}" >> "$GITHUB_ENV"
           else
-            echo "BRANCH_REF=${{ env.LATEST_TAG }}" >> "$GITHUB_ENV"
+            echo "BRANCH_REF=${LATEST_TAG}" >> "$GITHUB_ENV"
           fi
 
       - name: Post success message for leanchecker on Zulip
@@ -172,7 +172,7 @@ jobs:
           if [ "${{ matrix.branch_type }}" == "master" ]; then
             echo "BRANCH_REF=${{ env.DEFAULT_BRANCH }}" >> "$GITHUB_ENV"
           else
-            echo "BRANCH_REF=${{ env.LATEST_TAG }}" >> "$GITHUB_ENV"
+            echo "BRANCH_REF=${LATEST_TAG}" >> "$GITHUB_ENV"
           fi
 
       # Checkout the branch or tag we want to test.
@@ -240,7 +240,7 @@ jobs:
           if [ "${{ matrix.branch_type }}" == "master" ]; then
             echo "BRANCH_REF=${{ env.DEFAULT_BRANCH }}" >> "$GITHUB_ENV"
           else
-            echo "BRANCH_REF=${{ env.LATEST_TAG }}" >> "$GITHUB_ENV"
+            echo "BRANCH_REF=${LATEST_TAG}" >> "$GITHUB_ENV"
           fi
 
       - name: Post success message for mathlib_test_executable on Zulip
@@ -295,7 +295,7 @@ jobs:
           if [ "${{ matrix.branch_type }}" == "master" ]; then
             echo "BRANCH_REF=${{ env.DEFAULT_BRANCH }}" >> "$GITHUB_ENV"
           else
-            echo "BRANCH_REF=${{ env.LATEST_TAG }}" >> "$GITHUB_ENV"
+            echo "BRANCH_REF=${LATEST_TAG}" >> "$GITHUB_ENV"
           fi
 
       # Checkout the branch or tag we want to test.
@@ -405,7 +405,7 @@ jobs:
           if [ "${{ matrix.branch_type }}" == "master" ]; then
             echo "BRANCH_REF=${{ env.DEFAULT_BRANCH }}" >> "$GITHUB_ENV"
           else
-            echo "BRANCH_REF=${{ env.LATEST_TAG }}" >> "$GITHUB_ENV"
+            echo "BRANCH_REF=${LATEST_TAG}" >> "$GITHUB_ENV"
           fi
 
       - name: Post success message for nanoda on Zulip

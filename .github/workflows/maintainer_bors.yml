@@ -156,8 +156,10 @@ jobs:
           for label in awaiting-author maintainer-merge; do
             curl --request DELETE \
               --url "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}${{ github.event.pull_request.number }}/labels/${label}" \
-              --header 'authorization: Bearer ${{ steps.app-token.outputs.token }}'
+              --header 'authorization: Bearer ${STEPS_APP_TOKEN_OUTPUTS_TOKEN}'
           done
+        env:
+          STEPS_APP_TOKEN_OUTPUTS_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: On bors r/d-, remove ready-to-merge or delegated label
         if: ${{ ! steps.merge_or_delegate.outputs.secrets == '' &&
@@ -169,8 +171,10 @@ jobs:
           for label in ready-to-merge delegated; do
             curl --request DELETE \
               --url "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}${{ github.event.pull_request.number }}/labels/${label}" \
-              --header 'authorization: Bearer ${{ steps.app-token.outputs.token }}'
+              --header 'authorization: Bearer ${STEPS_APP_TOKEN_OUTPUTS_TOKEN}'
           done
+        env:
+          STEPS_APP_TOKEN_OUTPUTS_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: Set up Python
         if: ${{ ! steps.merge_or_delegate.outputs.secrets == '' &&
@@ -209,5 +213,6 @@ jobs:
           ZULIP_API_KEY: ${{ secrets.ZULIP_API_KEY }}
           ZULIP_EMAIL: github-mathlib4-bot@leanprover.zulipchat.com
           ZULIP_SITE: https://leanprover.zulipchat.com
+          STEPS_MERGE_OR_DELEGATE_OUTPUTS_MORD: ${{ steps.merge_or_delegate.outputs.mOrD }}
         run: |
-          python scripts/zulip_emoji_reactions.py "$ZULIP_API_KEY" "$ZULIP_EMAIL" "$ZULIP_SITE" "${{ steps.merge_or_delegate.outputs.mOrD }}" "${{ steps.merge_or_delegate.outputs.mOrD }}" "${{ github.event.issue.number }}${{ github.event.pull_request.number }}"
+          python scripts/zulip_emoji_reactions.py "$ZULIP_API_KEY" "$ZULIP_EMAIL" "$ZULIP_SITE" "${STEPS_MERGE_OR_DELEGATE_OUTPUTS_MORD}" "${STEPS_MERGE_OR_DELEGATE_OUTPUTS_MORD}" "${{ github.event.issue.number }}${{ github.event.pull_request.number }}"

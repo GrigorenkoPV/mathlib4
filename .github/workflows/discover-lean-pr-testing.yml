@@ -74,8 +74,8 @@ jobs:
         cd lean4-nightly || exit 1
 
         # Use the OLD and NEW toolchains determined in the previous step
-        OLD="${{ steps.determine-toolchains.outputs.old }}"
-        NEW="${{ steps.determine-toolchains.outputs.new }}"
+        OLD="${STEPS_DETERMINE_TOOLCHAINS_OUTPUTS_OLD}"
+        NEW="${STEPS_DETERMINE_TOOLCHAINS_OUTPUTS_NEW}"
 
         # Fetch the $OLD tag
         git fetch --depth=1 origin tag "$OLD" --no-tags
@@ -114,12 +114,15 @@ jobs:
         # Output the PRs
         echo "Found PRs: $PRS"
         printf "prs<<EOF\n%s\nEOF" "$PRS" >> "$GITHUB_OUTPUT"
+      env:
+        STEPS_DETERMINE_TOOLCHAINS_OUTPUTS_OLD: ${{ steps.determine-toolchains.outputs.old }}
+        STEPS_DETERMINE_TOOLCHAINS_OUTPUTS_NEW: ${{ steps.determine-toolchains.outputs.new }}
 
     - name: Use merged PRs information
       id: find-branches
       run: |
         # Use the PRs from the previous step
-        PRS="${{ steps.get-prs.outputs.prs }}"
+        PRS="${STEPS_GET_PRS_OUTPUTS_PRS}"
         echo "=== PRS ========================="
         echo "$PRS"
 
@@ -171,12 +174,14 @@ jobs:
         else
           echo "branches_exist=true" >> "$GITHUB_ENV"
         fi
+      env:
+        STEPS_GET_PRS_OUTPUTS_PRS: ${{ steps.get-prs.outputs.prs }}
 
     - name: Execute merge script for each branch
       id: execute-merges
       if: env.branches_exist == 'true'
       run: |
-        BRANCHES="${{ steps.find-branches.outputs.branches }}"
+        BRANCHES="${STEPS_FIND_BRANCHES_OUTPUTS_BRANCHES}"
 
         # Initialize arrays to track results
         SUCCESSFUL_MERGES=""
@@ -245,13 +250,15 @@ jobs:
         # Output the results
         echo "successful_merges=$SUCCESSFUL_MERGES" >> "$GITHUB_OUTPUT"
         echo "failed_merges=$FAILED_MERGES" >> "$GITHUB_OUTPUT"
+      env:
+        STEPS_FIND_BRANCHES_OUTPUTS_BRANCHES: ${{ steps.find-branches.outputs.branches }}
 
     - name: Prepare Zulip message
       id: zulip-message
       if: env.branches_exist == 'true'
       run: |
-        SUCCESSFUL_MERGES="${{ steps.execute-merges.outputs.successful_merges }}"
-        FAILED_MERGES="${{ steps.execute-merges.outputs.failed_merges }}"
+        SUCCESSFUL_MERGES="${STEPS_EXECUTE_MERGES_OUTPUTS_SUCCESSFUL_MERGES}"
+        FAILED_MERGES="${STEPS_EXECUTE_MERGES_OUTPUTS_FAILED_MERGES}"
 
         # Start building the message
         MESSAGE=""
@@ -284,6 +291,9 @@ jobs:
 
         # Output the message using the correct GitHub Actions syntax
         printf 'msg<<EOF\n%s\nEOF' "$MESSAGE" | tee "$GITHUB_OUTPUT"
+      env:
+        STEPS_EXECUTE_MERGES_OUTPUTS_SUCCESSFUL_MERGES: ${{ steps.execute-merges.outputs.successful_merges }}
+        STEPS_EXECUTE_MERGES_OUTPUTS_FAILED_MERGES: ${{ steps.execute-merges.outputs.failed_merges }}
 
     - name: Send message on Zulip
       if: env.branches_exist == 'true'

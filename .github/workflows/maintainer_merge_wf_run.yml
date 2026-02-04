@@ -108,7 +108,7 @@ jobs:
         id: form_the_message
         run: |
           message="$(
-            ./scripts/maintainer_merge_message.sh "${AUTHOR}" "${{ steps.extract-data.outputs.mOrD }}" "${EVENT_NAME}" "${PR_NUMBER}" "${PR_URL}" "${PR_TITLE}" "${COMMENT}" "${PR_AUTHOR}"
+            ./scripts/maintainer_merge_message.sh "${AUTHOR}" "${STEPS_EXTRACT_DATA_OUTPUTS_MORD}" "${EVENT_NAME}" "${PR_NUMBER}" "${PR_URL}" "${PR_TITLE}" "${COMMENT}" "${PR_AUTHOR}"
           )"
           printf 'title<<EOF\n%s\nEOF' "${message}" | tee "$GITHUB_OUTPUT"
         env:
@@ -119,6 +119,7 @@ jobs:
           PR_TITLE: ${{ steps.extract-data.outputs.pr_title }}
           COMMENT: ${{ steps.extract-data.outputs.comment }}
           PR_AUTHOR: ${{ steps.extract-data.outputs.pr_author }}
+          STEPS_EXTRACT_DATA_OUTPUTS_MORD: ${{ steps.extract-data.outputs.mOrD }}
 
       - name: Send message on Zulip
         if: ${{ steps.actorTeams.outputs.isTeamMember == 'true' }}

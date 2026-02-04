@@ -88,15 +88,15 @@ jobs:
           # Default to false
           create_pr=false
           # Log individual reasons for running the create-pull-request action
-          if [ -z "${{ steps.get-branch-sha.outputs.sha }}" ]; then
+          if [ -z "${STEPS_GET_BRANCH_SHA_OUTPUTS_SHA}" ]; then
             create_pr=true
             echo "$BRANCH_NAME does not exist, need to run create-pull-request to create it"
           fi
-          if [ "${{ steps.PR.outputs.pr_found }}" != "true" ]; then
+          if [ "${STEPS_PR_OUTPUTS_PR_FOUND}" != "true" ]; then
             create_pr=true
             echo "PR does not exist, need to run create-pull-request to check whether one should be created"
           fi
-          if [ "${{ steps.PR.outputs.pr_found }}" == "true" ] && \
+          if [ "${STEPS_PR_OUTPUTS_PR_FOUND}" == "true" ] && \
              git diff --quiet "origin/master" -- lake-manifest.json; then
             create_pr=true
             echo "No differences found with lake-manifest.json on master, need to run create-pull-request to close the PR"
@@ -105,13 +105,16 @@ jobs:
             create_pr=true
             echo "merge-conflict on PR, need to run create-pull-request to update $BRANCH_NAME"
           fi
-          if [ -n "${{ steps.get-branch-sha.outputs.sha }}" ] && \
+          if [ -n "${STEPS_GET_BRANCH_SHA_OUTPUTS_SHA}" ] && \
              ! git diff --quiet "origin/$BRANCH_NAME" -- lake-manifest.json; then
             create_pr=true
             echo "Differences found with lake-manifest.json on $BRANCH_NAME, need to run create-pull-request to update $BRANCH_NAME"
           fi
           # Otherwise, there's no reason to run create-pull-request
           echo "create_pr=$create_pr" >> "${GITHUB_OUTPUT}"
+        env:
+          STEPS_GET_BRANCH_SHA_OUTPUTS_SHA: ${{ steps.get-branch-sha.outputs.sha }}
+          STEPS_PR_OUTPUTS_PR_FOUND: ${{ steps.PR.outputs.pr_found }}
 
       - name: Generate PR title
         id: pr-title
